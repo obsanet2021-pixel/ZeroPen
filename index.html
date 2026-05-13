@@ -28,6 +28,14 @@
         <line x1="12" y1="17" x2="12" y2="21"/>
       </svg>
     </div>
+    <!-- Download Project -->
+    <div class="activity-icon" id="download-btn" title="Download Project as ZIP">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    </div>
     <div style="flex:1;"></div>
     <!-- Theme Toggle -->
     <div class="activity-icon" id="theme-toggle" title="Toggle Dark/Light Theme">
@@ -71,12 +79,9 @@
   <!-- Main Area -->
   <div class="main-area" id="main-area">
     <div class="tab-bar" id="tab-bar"></div>
-    <!-- Editor + Preview split -->
     <div class="editor-preview-split" id="editor-preview-split">
       <div class="editor-container" id="editor-container"></div>
-      <!-- Horizontal resize handle -->
       <div class="resize-handle horizontal" id="preview-handle"></div>
-      <!-- Preview panel -->
       <div class="preview-panel" id="preview-panel" style="display:none;">
         <div class="preview-header">
           <span>PREVIEW</span>
@@ -90,10 +95,13 @@
       <span>ZeroPen</span>
     </div>
   </div>
+  <!-- JSZip for download feature -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
   <script src="js/editor.js"></script>
   <script src="js/resizer.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/preview.js"></script>
+  <script src="js/download.js"></script>
 </body>
 </html>
