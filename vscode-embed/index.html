@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZeroPen — VS Code + DeepSeek AI</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <span>DEEPSEEK AI</span>
+        <a href="../index.html" class="home-link" title="Back to ZeroPen Home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </a>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="message assistant">
+          <strong>DeepSeek AI</strong> is ready.<br>
+          Ask me about your code, get explanations, or request edits.
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <textarea id="chat-input" placeholder="Ask DeepSeek..." rows="3"></textarea>
+        <button id="send-btn">Send</button>
+      </div>
+      <div class="sidebar-footer">
+        <small>VS Code for the Web is loaded on the right →</small>
+      </div>
+    </div>
+    <div class="vscode-container">
+      <iframe id="vscode-frame" src="https://vscode.dev" 
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads">
+      </iframe>
+    </div>
+  </div>
+  <script src="js/deepseek.js"></script>
+</body>
+</html>
