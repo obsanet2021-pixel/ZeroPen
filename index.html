@@ -7,74 +7,111 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #1e1e1e;
-      color: #ccc;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
-      gap: 40px;
-      flex-wrap: wrap;
-      padding: 20px;
+      justify-content: center;
+      padding: 40px 20px;
     }
-    .mode-card {
-      background: #252526;
-      border: 2px solid #444;
-      border-radius: 12px;
-      padding: 40px;
-      width: 350px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .mode-card:hover {
-      border-color: #0078d4;
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,120,212,0.3);
-    }
-    .mode-card h2 {
-      font-size: 24px;
-      margin-bottom: 16px;
-      color: #fff;
-    }
-    .mode-card p {
-      color: #999;
-      margin-bottom: 24px;
-      line-height: 1.6;
-    }
-    .mode-card .icon {
+    .logo {
       font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #58a6ff, #bc8cff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .tagline {
+      color: #8b949e;
+      font-size: 18px;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+    .cards {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 900px;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 32px;
+      width: 380px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .card:hover {
+      border-color: #58a6ff;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(88, 166, 255, 0.15);
+    }
+    .card-icon {
+      font-size: 40px;
       margin-bottom: 16px;
     }
-    .badge {
+    .card h2 {
+      font-size: 22px;
+      color: #f0f6fc;
+      margin-bottom: 8px;
+    }
+    .card p {
+      color: #8b949e;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .card-badge {
       display: inline-block;
       padding: 4px 12px;
-      border-radius: 12px;
+      border-radius: 20px;
       font-size: 12px;
-      margin-top: 12px;
+      font-weight: 600;
     }
-    .badge.open-source { background: #2ea043; color: #fff; }
-    .badge.full-featured { background: #0078d4; color: #fff; }
-    a { text-decoration: none; color: inherit; }
+    .badge-open { background: #238636; color: #fff; }
+    .badge-featured { background: #1f6feb; color: #fff; }
+    .footer {
+      margin-top: 48px;
+      color: #484f58;
+      font-size: 13px;
+      text-align: center;
+    }
+    .footer a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+    .footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <a href="monaco-editor/index.html">
-    <div class="mode-card">
-      <div class="icon">🛠️</div>
+  <div class="logo">ZeroPen</div>
+  <p class="tagline">Code anywhere, powered by DeepSeek AI</p>
+  <div class="cards">
+    <a href="monaco-editor/index.html" class="card">
+      <div class="card-icon">🛠️</div>
       <h2>ZeroPen Editor</h2>
-      <p>Our custom-built Monaco editor with file management, live preview, themes, and DeepSeek AI — fully open source.</p>
-      <span class="badge open-source">Open Source</span>
-    </div>
-  </a>
-  <a href="vscode-embed/index.html">
-    <div class="mode-card">
-      <div class="icon">⚡</div>
+      <p>Custom Monaco-powered editor with file management, live preview, ZIP export, themes, and DeepSeek AI chat — fully open source.</p>
+      <span class="card-badge badge-open">Open Source</span>
+    </a>
+    <a href="vscode-embed/index.html" class="card">
+      <div class="card-icon">⚡</div>
       <h2>VS Code + DeepSeek</h2>
-      <p>Full VS Code for the Web with DeepSeek AI sidebar. All extensions, terminal, and features included.</p>
-      <span class="badge full-featured">Full Featured</span>
-    </div>
-  </a>
+      <p>Launch VS Code for the Web alongside DeepSeek AI. Get the full IDE experience with intelligent code assistance.</p>
+      <span class="card-badge badge-featured">Full Featured</span>
+    </a>
+  </div>
+  <p class="footer">
+    Built with ❤️ | <a href="https://github.com/obsanet2021-pixel/ZeroPen" target="_blank">GitHub</a>
+  </p>
 </body>
 </html>
