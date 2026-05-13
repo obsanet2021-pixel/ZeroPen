@@ -20,10 +20,35 @@
         <path d="M12 6v6l4 2"/>
       </svg>
     </div>
+    <!-- Preview Toggle -->
+    <div class="activity-icon" id="preview-toggle" title="Toggle Preview">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+    </div>
+    <div style="flex:1;"></div>
+    <!-- Theme Toggle -->
+    <div class="activity-icon" id="theme-toggle" title="Toggle Dark/Light Theme">
+      <svg id="theme-icon-dark" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+      </svg>
+      <svg id="theme-icon-light" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </div>
   </div>
-  <!-- Resize handle for activity bar -->
   <div class="resize-handle vertical" id="activity-bar-handle"></div>
-  <!-- Sidebar Panel -->
+  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-content active" id="explorer-content">
       <div class="sidebar-header">EXPLORER</div>
@@ -42,12 +67,24 @@
       </div>
     </div>
   </div>
-  <!-- Resize handle for sidebar -->
   <div class="resize-handle vertical" id="sidebar-handle"></div>
-  <!-- Main Editor Area -->
+  <!-- Main Area -->
   <div class="main-area" id="main-area">
     <div class="tab-bar" id="tab-bar"></div>
-    <div class="editor-container" id="editor-container"></div>
+    <!-- Editor + Preview split -->
+    <div class="editor-preview-split" id="editor-preview-split">
+      <div class="editor-container" id="editor-container"></div>
+      <!-- Horizontal resize handle -->
+      <div class="resize-handle horizontal" id="preview-handle"></div>
+      <!-- Preview panel -->
+      <div class="preview-panel" id="preview-panel" style="display:none;">
+        <div class="preview-header">
+          <span>PREVIEW</span>
+          <button id="close-preview-btn" title="Close Preview">&times;</button>
+        </div>
+        <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+      </div>
+    </div>
     <div class="status-bar">
       <span id="current-file">No file open</span>
       <span>ZeroPen</span>
@@ -56,5 +93,7 @@
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
   <script src="js/editor.js"></script>
   <script src="js/resizer.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/preview.js"></script>
 </body>
 </html>
