@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Activity Bar (left icons) -->
-  <div class="activity-bar">
+  <!-- Activity Bar -->
+  <div class="activity-bar" id="activity-bar">
     <div class="activity-icon active" data-sidebar="explorer" title="Explorer">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
@@ -21,16 +21,14 @@
       </svg>
     </div>
   </div>
-  <!-- Sidebar Panel (toggles between file explorer and DeepSeek chat) -->
+  <!-- Resize handle for activity bar -->
+  <div class="resize-handle vertical" id="activity-bar-handle"></div>
+  <!-- Sidebar Panel -->
   <div class="sidebar" id="sidebar">
-    <!-- Explorer content (file tree) -->
     <div class="sidebar-content active" id="explorer-content">
       <div class="sidebar-header">EXPLORER</div>
-      <div class="file-tree" id="file-tree">
-        <!-- Dynamically filled -->
-      </div>
+      <div class="file-tree" id="file-tree"></div>
     </div>
-    <!-- DeepSeek chat content (placeholder) -->
     <div class="sidebar-content" id="deepseek-content">
       <div class="sidebar-header">DEEPSEEK AI</div>
       <div class="chat-container">
@@ -44,22 +42,19 @@
       </div>
     </div>
   </div>
+  <!-- Resize handle for sidebar -->
+  <div class="resize-handle vertical" id="sidebar-handle"></div>
   <!-- Main Editor Area -->
-  <div class="main-area">
-    <!-- Tab bar -->
-    <div class="tab-bar" id="tab-bar">
-      <!-- Tabs will be added here -->
-    </div>
-    <!-- Editor container -->
+  <div class="main-area" id="main-area">
+    <div class="tab-bar" id="tab-bar"></div>
     <div class="editor-container" id="editor-container"></div>
-    <!-- Status bar -->
     <div class="status-bar">
       <span id="current-file">No file open</span>
       <span>ZeroPen</span>
     </div>
   </div>
-  <!-- Monaco Editor Loader -->
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
   <script src="js/editor.js"></script>
+  <script src="js/resizer.js"></script>
 </body>
 </html>
