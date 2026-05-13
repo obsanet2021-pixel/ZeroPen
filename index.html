@@ -1,34 +1,65 @@
-@'
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZeroPen – Free Live Code Editor</title>
+  <title>ZeroPen – vscode.dev style with DeepSeek</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="editor-panel">
-      <div class="editor-header">HTML</div>
-      <div id="html-editor" class="editor"></div>
+  <!-- Activity Bar (left icons) -->
+  <div class="activity-bar">
+    <div class="activity-icon active" data-sidebar="explorer" title="Explorer">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+      </svg>
     </div>
-    <div class="editor-panel">
-      <div class="editor-header">CSS</div>
-      <div id="css-editor" class="editor"></div>
-    </div>
-    <div class="editor-panel">
-      <div class="editor-header">JS</div>
-      <div id="js-editor" class="editor"></div>
-    </div>
-    <div class="preview-panel">
-      <div class="editor-header">PREVIEW</div>
-      <iframe id="preview-frame"></iframe>
+    <div class="activity-icon" data-sidebar="deepseek" title="DeepSeek AI">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
     </div>
   </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.min.js"></script>
+  <!-- Sidebar Panel (toggles between file explorer and DeepSeek chat) -->
+  <div class="sidebar" id="sidebar">
+    <!-- Explorer content (file tree) -->
+    <div class="sidebar-content active" id="explorer-content">
+      <div class="sidebar-header">EXPLORER</div>
+      <div class="file-tree" id="file-tree">
+        <!-- Dynamically filled -->
+      </div>
+    </div>
+    <!-- DeepSeek chat content (placeholder) -->
+    <div class="sidebar-content" id="deepseek-content">
+      <div class="sidebar-header">DEEPSEEK AI</div>
+      <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+          <div class="message assistant">DeepSeek is ready. Ask me anything about your code.</div>
+        </div>
+        <div class="chat-input-area">
+          <textarea id="chat-input" placeholder="Ask DeepSeek..." rows="2"></textarea>
+          <button id="send-btn">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Main Editor Area -->
+  <div class="main-area">
+    <!-- Tab bar -->
+    <div class="tab-bar" id="tab-bar">
+      <!-- Tabs will be added here -->
+    </div>
+    <!-- Editor container -->
+    <div class="editor-container" id="editor-container"></div>
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span id="current-file">No file open</span>
+      <span>ZeroPen</span>
+    </div>
+  </div>
+  <!-- Monaco Editor Loader -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
   <script src="js/editor.js"></script>
 </body>
 </html>
-'@ | Out-File -FilePath index.html -Encoding utf8

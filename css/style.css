@@ -1,38 +1,163 @@
-@'
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body, html { height: 100%; font-family: sans-serif; background: #1e1e1e; color: #fff; }
-.container {
-  display: flex;
-  height: 100vh;
-}
-.editor-panel {
-  flex: 1;
+﻿* { margin: 0; padding: 0; box-sizing: border-box; }
+body, html { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1e1e1e; color: #ccc; display: flex; overflow: hidden; }
+/* Activity Bar */
+.activity-bar {
+  width: 48px;
+  background: #333;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #333;
+  align-items: center;
+  padding-top: 8px;
+  gap: 4px;
+  border-right: 1px solid #444;
 }
-.editor-panel:last-of-type { border-right: none; }
-.editor-header {
-  padding: 8px 12px;
-  background: #2d2d2d;
-  font-size: 14px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  color: #aaa;
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #999;
+}
+.activity-icon.active {
+  color: #fff;
+  background: #094771;
+}
+.activity-icon:hover { background: #2a2d2e; }
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background: #252526;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #444;
+  overflow: hidden;
+}
+.sidebar-content {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+}
+.sidebar-content.active {
+  display: flex;
+}
+.sidebar-header {
+  padding: 10px;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #bbb;
+  background: #2d2d2d;
+  border-bottom: 1px solid #444;
 }
-.editor {
+.file-tree {
+  padding: 8px;
+  overflow-y: auto;
   flex: 1;
-  min-height: 0;
 }
-.preview-panel {
+.file-item {
+  padding: 4px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+.file-item:hover { background: #2a2d2e; }
+.file-item.active { background: #094771; }
+.file-item .file-icon { color: #999; width: 16px; text-align: center; }
+/* Chat */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.chat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+.message {
+  margin-bottom: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  max-width: 90%;
+}
+.message.assistant { background: #2a2d2e; }
+.message.user { background: #094771; margin-left: auto; }
+.chat-input-area {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+  border-top: 1px solid #444;
+  background: #2d2d2d;
+}
+.chat-input-area textarea {
+  flex: 1;
+  background: #3c3c3c;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #fff;
+  padding: 6px;
+  resize: none;
+  font-size: 13px;
+}
+.chat-input-area button {
+  padding: 4px 12px;
+  background: #0078d4;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+/* Main area */
+.main-area {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-iframe {
-  flex: 1;
-  border: none;
-  background: #fff;
+.tab-bar {
+  background: #2d2d2d;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  border-bottom: 1px solid #444;
+  overflow-x: auto;
+  min-height: 35px;
 }
-'@ | Out-File -FilePath css/style.css -Encoding utf8
+.tab {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: #2d2d2d;
+  border-right: 1px solid #444;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tab.active {
+  background: #1e1e1e;
+  border-top: 1px solid #007acc;
+}
+.tab .close-tab {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #999;
+  cursor: pointer;
+}
+.tab .close-tab:hover { color: #fff; }
+.editor-container {
+  flex: 1;
+  overflow: hidden;
+}
+.status-bar {
+  background: #007acc;
+  color: #fff;
+  padding: 2px 10px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+}

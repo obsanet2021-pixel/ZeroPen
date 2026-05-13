@@ -1,73 +1,192 @@
-@'
-function createEditor(elementId, mode, initialContent) {
-  const editor = ace.edit(elementId, {
-    mode: mode,
-    theme: "ace/theme/monokai",
-    fontSize: "14px",
-    showPrintMargin: false,
-    wrap: true,
-    useWorker: false
+﻿// Virtual File System (in-memory, later localStorage)
+const vfs = {
+  'index.html': '<h1>Hello ZeroPen!</h1>\n<p>Edit me</p>',
+  'style.css': 'body { background: #f0f0f0; }',
+  'script.js': 'console.log("Hello");',
+  'readme.md': '# ZeroPen\nA vscode.dev style editor with DeepSeek.'
+};
+const fileTreeState = {
+  expanded: true  // we'll keep it simple, always expanded
+};
+// Current state
+let openTabs = new Map(); // filename -> editor model
+let activeTab = null;
+let monacoEditor = null;
+// Wait for Monaco to load
+require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' } });
+require(['vs/editor/editor.main'], function () {
+  initEditor();
+  renderFileTree();
+  setupTabs();
+  setupSidebarToggle();
+  setupDeepSeekPlaceholder();
+  // Open a default file
+  openFile('index.html');
+});
+function initEditor() {
+  monacoEditor = monaco.editor.create(document.getElementById('editor-container'), {
+    value: '',
+    language: 'plaintext',
+    theme: 'vs-dark',
+    automaticLayout: true,
+    fontSize: 14,
+    minimap: { enabled: false }
   });
-  editor.setValue(initialContent, -1);
-  editor.clearSelection();
-  return editor;
+  // Listen for model changes to update status bar (optional)
+  monacoEditor.onDidChangeModelContent(() => {
+    // Could auto-save to vfs
+    const model = monacoEditor.getModel();
+    if (model && model._associatedFileName) {
+      vfs[model._associatedFileName] = model.getValue();
+    }
+  });
 }
-
-const htmlContent = `<!-- Write your HTML here -->
-<h1>Hello, ZeroPen!</h1>
-<p>We built this together 🤝</p>`;
-
-const cssContent = `/* Write your CSS here */
-body {
-  background: #f0f0f0;
-  font-family: Arial, sans-serif;
-  padding: 20px;
+function getLanguageFromFileName(filename) {
+  const ext = filename.split('.').pop().toLowerCase();
+  const map = {
+    'html': 'html',
+    'css': 'css',
+    'js': 'javascript',
+    'md': 'markdown',
+    'py': 'python',
+    'rb': 'ruby',
+    'json': 'json',
+    'ts': 'typescript'
+  };
+  return map[ext] || 'plaintext';
 }
-h1 {
-  color: #e91e63;
-}`;
-
-const jsContent = `// Write your JavaScript here
-document.querySelector('h1').addEventListener('click', () => {
-  alert('You clicked the heading!');
-});`;
-
-const htmlEditor = createEditor("html-editor", "ace/mode/html", htmlContent);
-const cssEditor  = createEditor("css-editor", "ace/mode/css", cssContent);
-const jsEditor   = createEditor("js-editor", "ace/mode/javascript", jsContent);
-const previewFrame = document.getElementById("preview-frame");
-
-function updatePreview() {
-  const html = htmlEditor.getValue();
-  const css  = cssEditor.getValue();
-  const js   = jsEditor.getValue();
-
-  const fullDocument = `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>${css}</style>
-</head>
-<body>
-  ${html}
-  <script>${js}<\/script>
-</body>
-</html>`;
-
-  const blob = new Blob([fullDocument], { type: "text/html" });
-  const url = URL.createObjectURL(blob);
-  previewFrame.src = url;
+function openFile(filename) {
+  // If already open, just switch
+  if (openTabs.has(filename)) {
+    switchToTab(filename);
+    return;
+  }
+  // Create a new model
+  const content = vfs[filename] || '';
+  const lang = getLanguageFromFileName(filename);
+  const model = monaco.editor.createModel(content, lang);
+  // Store filename reference (not a standard property, but works)
+  model._associatedFileName = filename;
+  openTabs.set(filename, model);
+  // Add a tab
+  addTab(filename, true);
+  switchToTab(filename);
 }
-
-let timeout;
-function onChange() {
-  clearTimeout(timeout);
-  timeout = setTimeout(updatePreview, 300);
+function switchToTab(filename) {
+  if (activeTab === filename) return;
+  activeTab = filename;
+  const model = openTabs.get(filename);
+  monacoEditor.setModel(model);
+  // Update tab styles
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.file === filename);
+  });
+  // Update status bar
+  document.getElementById('current-file').textContent = filename;
 }
-
-htmlEditor.session.on('change', onChange);
-cssEditor.session.on('change', onChange);
-jsEditor.session.on('change', onChange);
-
-updatePreview();
-'@ | Out-File -FilePath js/editor.js -Encoding utf8
+function addTab(filename, focus = false) {
+  const tabBar = document.getElementById('tab-bar');
+  const existing = document.querySelector(`.tab[data-file="${filename}"]`);
+  if (existing) return;
+  const tab = document.createElement('div');
+  tab.className = 'tab' + (focus ? ' active' : '');
+  tab.dataset.file = filename;
+  tab.innerHTML = `
+    <span class="tab-label">${filename}</span>
+    <span class="close-tab" data-file="${filename}">&times;</span>
+  `;
+  tab.addEventListener('click', (e) => {
+    if (e.target.classList.contains('close-tab')) {
+      closeFile(filename);
+    } else {
+      switchToTab(filename);
+    }
+  });
+  tabBar.appendChild(tab);
+  if (focus) {
+    switchToTab(filename);
+  }
+}
+function closeFile(filename) {
+  if (openTabs.has(filename)) {
+    const model = openTabs.get(filename);
+    model.dispose();
+    openTabs.delete(filename);
+  }
+  // Remove tab
+  const tab = document.querySelector(`.tab[data-file="${filename}"]`);
+  if (tab) tab.remove();
+  // If closed the active file, switch to another
+  if (activeTab === filename) {
+    if (openTabs.size > 0) {
+      const nextFile = openTabs.keys().next().value;
+      switchToTab(nextFile);
+    } else {
+      monacoEditor.setModel(null);
+      activeTab = null;
+      document.getElementById('current-file').textContent = 'No file open';
+    }
+  }
+}
+function renderFileTree() {
+  const tree = document.getElementById('file-tree');
+  tree.innerHTML = '';
+  Object.keys(vfs).forEach(filename => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = `
+      <span class="file-icon">📄</span>
+      <span>${filename}</span>
+    `;
+    item.addEventListener('click', () => openFile(filename));
+    tree.appendChild(item);
+  });
+}
+function setupTabs() {
+  // Only needed if we want to open the first file on load
+}
+function setupSidebarToggle() {
+  const icons = document.querySelectorAll('.activity-icon');
+  icons.forEach(icon => {
+    icon.addEventListener('click', () => {
+      // Deactivate all
+      icons.forEach(i => i.classList.remove('active'));
+      // Activate this
+      icon.classList.add('active');
+      const panel = icon.dataset.sidebar;
+      document.querySelectorAll('.sidebar-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(panel + '-content').classList.add('active');
+    });
+  });
+}
+function setupDeepSeekPlaceholder() {
+  const sendBtn = document.getElementById('send-btn');
+  const input = document.getElementById('chat-input');
+  const messages = document.getElementById('chat-messages');
+  sendBtn.addEventListener('click', () => {
+    const text = input.value.trim();
+    if (!text) return;
+    // Add user message
+    addChatMessage(text, 'user');
+    input.value = '';
+    // Simulate DeepSeek response (replace with real API later)
+    setTimeout(() => {
+      addChatMessage("DeepSeek: I'm your AI agent. (API integration coming soon!)", 'assistant');
+    }, 500);
+  });
+  // Allow Enter to send (Shift+Enter for new line)
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+}
+function addChatMessage(text, sender) {
+  const messages = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = 'message ' + sender;
+  msg.textContent = text;
+  messages.appendChild(msg);
+  messages.scrollTop = messages.scrollHeight;
+}
