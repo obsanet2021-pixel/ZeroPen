@@ -5,44 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ZeroPen – Free Live Code Editor</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body, html { height: 100%; font-family: sans-serif; background: #1e1e1e; color: #fff; }
-    .container {
-      display: flex;
-      height: 100vh;
-    }
-    .editor-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      border-right: 1px solid #333;
-    }
-    .editor-panel:last-of-type { border-right: none; }
-    .editor-header {
-      padding: 8px 12px;
-      background: #2d2d2d;
-      font-size: 14px;
-      font-weight: bold;
-      letter-spacing: 1px;
-      color: #aaa;
-      text-transform: uppercase;
-    }
-    .editor {
-      flex: 1;
-      min-height: 0;
-    }
-    .preview-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    iframe {
-      flex: 1;
-      border: none;
-      background: #fff;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="container">
@@ -65,80 +28,7 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.min.js"></script>
-
-  <script>
-    function createEditor(elementId, mode, initialContent) {
-      const editor = ace.edit(elementId, {
-        mode: mode,
-        theme: "ace/theme/monokai",
-        fontSize: "14px",
-        showPrintMargin: false,
-        wrap: true,
-        useWorker: false
-      });
-      editor.setValue(initialContent, -1);
-      editor.clearSelection();
-      return editor;
-    }
-
-    const htmlContent = `<!-- Write your HTML here -->
-<h1>Hello, ZeroPen!</h1>
-<p>We built this together 🤝</p>`;
-
-    const cssContent = `/* Write your CSS here */
-body {
-  background: #f0f0f0;
-  font-family: Arial, sans-serif;
-  padding: 20px;
-}
-h1 {
-  color: #e91e63;
-}`;
-
-    const jsContent = `// Write your JavaScript here
-document.querySelector('h1').addEventListener('click', () => {
-  alert('You clicked the heading!');
-});`;
-
-    const htmlEditor = createEditor("html-editor", "ace/mode/html", htmlContent);
-    const cssEditor  = createEditor("css-editor", "ace/mode/css", cssContent);
-    const jsEditor   = createEditor("js-editor", "ace/mode/javascript", jsContent);
-    const previewFrame = document.getElementById("preview-frame");
-
-    function updatePreview() {
-      const html = htmlEditor.getValue();
-      const css  = cssEditor.getValue();
-      const js   = jsEditor.getValue();
-
-      const fullDocument = `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>${css}</style>
-</head>
-<body>
-  ${html}
-  <script>${js}<\/script>
-</body>
-</html>`;
-
-      const blob = new Blob([fullDocument], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      previewFrame.src = url;
-    }
-
-    let timeout;
-    function onChange() {
-      clearTimeout(timeout);
-      timeout = setTimeout(updatePreview, 300);
-    }
-
-    htmlEditor.session.on('change', onChange);
-    cssEditor.session.on('change', onChange);
-    jsEditor.session.on('change', onChange);
-
-    updatePreview();
-  </script>
+  <script src="js/editor.js"></script>
 </body>
 </html>
 '@ | Out-File -FilePath index.html -Encoding utf8

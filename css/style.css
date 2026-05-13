@@ -1,0 +1,38 @@
+@'
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body, html { height: 100%; font-family: sans-serif; background: #1e1e1e; color: #fff; }
+.container {
+  display: flex;
+  height: 100vh;
+}
+.editor-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #333;
+}
+.editor-panel:last-of-type { border-right: none; }
+.editor-header {
+  padding: 8px 12px;
+  background: #2d2d2d;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #aaa;
+  text-transform: uppercase;
+}
+.editor {
+  flex: 1;
+  min-height: 0;
+}
+.preview-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+iframe {
+  flex: 1;
+  border: none;
+  background: #fff;
+}
+'@ | Out-File -FilePath css/style.css -Encoding utf8
