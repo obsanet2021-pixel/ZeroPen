@@ -16,20 +16,18 @@ function loadFileSystem() {
       console.error('[ZeroPen] Failed to parse stored files, using defaults');
     }
   }
-  // First time: save demo files to localStorage
   localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_FILES));
   return { ...DEMO_FILES };
 }
-// Save entire file system to localStorage
 function saveFileSystem() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(vfs));
 }
-// Initialize vfs
 const vfs = loadFileSystem();
 // Current state
 let openTabs = new Map();
 let activeTab = null;
 let monacoEditor = null;
+let contextMenuTarget = null; // file being right-clicked
 // Wait for Monaco to load
 require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' } });
 require(['vs/editor/editor.main'], function () {
@@ -38,7 +36,7 @@ require(['vs/editor/editor.main'], function () {
   setupTabs();
   setupSidebarToggle();
   setupDeepSeekPlaceholder();
-  // Open the first file or restore last session
+  setupContextMenu();
   const lastOpen = localStorage.getItem('zeropen_last_file') || 'index.html';
   if (vfs[lastOpen]) {
     openFile(lastOpen);
@@ -55,29 +53,135 @@ function initEditor() {
     fontSize: 14,
     minimap: { enabled: false }
   });
-  // Auto-save on changes
   monacoEditor.onDidChangeModelContent(() => {
     const model = monacoEditor.getModel();
     if (model && model._associatedFileName) {
       vfs[model._associatedFileName] = model.getValue();
-      saveFileSystem();  // ← PERSIST
+      saveFileSystem();
     }
   });
 }
 function getLanguageFromFileName(filename) {
   const ext = filename.split('.').pop().toLowerCase();
   const map = {
-    'html': 'html',
-    'css': 'css',
-    'js': 'javascript',
-    'md': 'markdown',
-    'py': 'python',
-    'rb': 'ruby',
-    'json': 'json',
-    'ts': 'typescript'
+    'html': 'html', 'css': 'css', 'js': 'javascript',
+    'md': 'markdown', 'py': 'python', 'rb': 'ruby',
+    'json': 'json', 'ts': 'typescript', 'txt': 'plaintext'
   };
   return map[ext] || 'plaintext';
 }
+// === File Operations ===
+function createNewFile() {
+  const filename = prompt('Enter file name (e.g., app.py, style.css):');
+  if (!filename) return;
+  // Sanitize: allow only safe characters
+  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '');
+  if (!safeName) return alert('Invalid file name.');
+  if (vfs[safeName]) {
+    return alert(`File "${safeName}" already exists.`);
+  }
+  vfs[safeName] = '';
+  saveFileSystem();
+  renderFileTree();
+  openFile(safeName);
+}
+function renameFile(oldName) {
+  const newName = prompt(`Rename "${oldName}" to:`, oldName);
+  if (!newName || newName === oldName) return;
+  const safeName = newName.replace(/[^a-zA-Z0-9._-]/g, '');
+  if (!safeName) return alert('Invalid file name.');
+  if (vfs[safeName]) return alert(`File "${safeName}" already exists.`);
+  // Move content to new key
+  vfs[safeName] = vfs[oldName];
+  delete vfs[oldName];
+  saveFileSystem();
+  // Update open tabs if the file was open
+  if (openTabs.has(oldName)) {
+    const model = openTabs.get(oldName);
+    model._associatedFileName = safeName;
+    openTabs.delete(oldName);
+    openTabs.set(safeName, model);
+    // Update tab UI
+    const tab = document.querySelector(`.tab[data-file="${oldName}"]`);
+    if (tab) {
+      tab.dataset.file = safeName;
+      tab.querySelector('.tab-label').textContent = safeName;
+    }
+    if (activeTab === oldName) {
+      activeTab = safeName;
+      document.getElementById('current-file').textContent = safeName;
+      localStorage.setItem('zeropen_last_file', safeName);
+    }
+  }
+  renderFileTree();
+}
+function deleteFile(filename) {
+  if (!confirm(`Delete "${filename}"? This cannot be undone.`)) return;
+  // Close the file if open
+  if (openTabs.has(filename)) {
+    closeFile(filename);
+  }
+  delete vfs[filename];
+  saveFileSystem();
+  renderFileTree();
+}
+// === UI: File Tree & Context Menu ===
+function renderFileTree() {
+  const tree = document.getElementById('file-tree');
+  tree.innerHTML = '';
+  // Add "New File" button at top
+  const newBtn = document.createElement('button');
+  newBtn.textContent = '+ New File';
+  newBtn.className = 'new-file-btn';
+  newBtn.addEventListener('click', createNewFile);
+  tree.appendChild(newBtn);
+  // List files
+  Object.keys(vfs).sort().forEach(filename => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = `
+      <span class="file-icon">📄</span>
+      <span>${filename}</span>
+    `;
+    item.addEventListener('click', () => openFile(filename));
+    item.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      contextMenuTarget = filename;
+      showContextMenu(e.clientX, e.clientY);
+    });
+    tree.appendChild(item);
+  });
+}
+function setupContextMenu() {
+  // Close context menu when clicking elsewhere
+  document.addEventListener('click', () => {
+    const menu = document.getElementById('context-menu');
+    if (menu) menu.remove();
+  });
+}
+function showContextMenu(x, y) {
+  // Remove any existing menu
+  const existing = document.getElementById('context-menu');
+  if (existing) existing.remove();
+  const menu = document.createElement('div');
+  menu.id = 'context-menu';
+  menu.className = 'context-menu';
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  menu.innerHTML = `
+    <div class="context-item" data-action="rename">✏️ Rename</div>
+    <div class="context-item delete" data-action="delete">🗑️ Delete</div>
+  `;
+  menu.addEventListener('click', (e) => {
+    const action = e.target.dataset.action;
+    if (action === 'rename') renameFile(contextMenuTarget);
+    if (action === 'delete') deleteFile(contextMenuTarget);
+    menu.remove();
+  });
+  // Prevent the document click handler from firing immediately
+  setTimeout(() => document.body.appendChild(menu), 0);
+}
+// === Tab Management ===
 function openFile(filename) {
   if (!vfs[filename]) return;
   if (openTabs.has(filename)) {
@@ -91,7 +195,6 @@ function openFile(filename) {
   openTabs.set(filename, model);
   addTab(filename, true);
   switchToTab(filename);
-  // Remember last opened file
   localStorage.setItem('zeropen_last_file', filename);
 }
 function switchToTab(filename) {
@@ -145,20 +248,6 @@ function closeFile(filename) {
     }
   }
 }
-function renderFileTree() {
-  const tree = document.getElementById('file-tree');
-  tree.innerHTML = '';
-  Object.keys(vfs).forEach(filename => {
-    const item = document.createElement('div');
-    item.className = 'file-item';
-    item.innerHTML = `
-      <span class="file-icon">📄</span>
-      <span>${filename}</span>
-    `;
-    item.addEventListener('click', () => openFile(filename));
-    tree.appendChild(item);
-  });
-}
 function setupTabs() {}
 function setupSidebarToggle() {
   const icons = document.querySelectorAll('.activity-icon');
@@ -172,7 +261,7 @@ function setupSidebarToggle() {
     });
   });
 }
-// === DeepSeek Chat (preserved) ===
+// === DeepSeek Chat ===
 function addChatMessage(text, sender) {
   const messagesContainer = document.getElementById('chat-messages');
   if (!messagesContainer) return;
@@ -206,7 +295,7 @@ function setupDeepSeekPlaceholder() {
     if (fileContext) {
       messages.push({ 
         role: "system", 
-        content: `The user is currently working on "${fileContext.fileName}". Content:\n\`\`\`\n${fileContext.content}\n\`\`\`` 
+        content: `The user is working on "${fileContext.fileName}". Content:\n\`\`\`\n${fileContext.content}\n\`\`\`` 
       });
     }
     messages.push({ role: "user", content: userMessage });
