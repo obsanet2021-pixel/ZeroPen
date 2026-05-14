@@ -26,12 +26,17 @@ async function sendMessage() {
       })
     });
     const data = await response.json();
+    if (data.error) {
+      removeMessage(thinkingId);
+      addMessage(`Error: ${data.error}`, 'assistant');
+      return;
+    }
     const reply = data.choices?.[0]?.message?.content || 'Sorry, no response received.';
     removeMessage(thinkingId);
     addMessage(reply, 'assistant');
   } catch (e) {
     removeMessage(thinkingId);
-    addMessage('Sorry, could not connect to DeepSeek. Please try again.', 'assistant');
+    addMessage('Sorry, could not connect to DeepSeek. The service may be overloaded. Please try again later.', 'assistant');
   }
 }
 function addMessage(text, sender) {

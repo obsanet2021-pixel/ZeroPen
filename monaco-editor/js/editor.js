@@ -379,13 +379,16 @@ function setupDeepSeekPlaceholder() {
         body: JSON.stringify({ model: 'deepseek-chat', messages: msgs, stream: false }),
       });
       const data = await res.json();
+      if (data.error) {
+        return `Error: ${data.error}`;
+      }
       if (data.choices?.length) {
         const ai = data.choices[0].message.content;
         history.push({ role: 'user', content: userMessage }, { role: 'assistant', content: ai });
         return ai;
       }
       return "Sorry, unexpected response.";
-    } catch (e) { return "Sorry, couldn't connect."; }
+    } catch (e) { return "Sorry, couldn't connect. The service may be overloaded. Please try again later."; }
   }
   sendBtn.addEventListener('click', async () => {
     const msg = input.value.trim(); if (!msg) return;

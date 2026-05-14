@@ -1,9 +1,26 @@
 ﻿const http = require('http');
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
 const PORT = 3000;
+
+// Load .env file if it exists
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+  const envLines = fs.readFileSync(envPath, 'utf-8').split('\n');
+  envLines.forEach(line => {
+    const [key, ...valueParts] = line.split('=');
+    if (key && valueParts.length) {
+      process.env[key.trim()] = valueParts.join('=').trim();
+    }
+  });
+}
+
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 if (!DEEPSEEK_API_KEY) {
   console.error('FATAL ERROR: DEEPSEEK_API_KEY not set.');
+  console.error('Please set DEEPSEEK_API_KEY environment variable or create a .env file with:');
+  console.error('DEEPSEEK_API_KEY=sk-7cc610a136f342b2ae5e68771acf27fa');
   process.exit(1);
 }
 const server = http.createServer((req, res) => {
@@ -36,7 +53,7 @@ const server = http.createServer((req, res) => {
       proxyReq.on('error', (error) => {
         console.error('[PROXY] Error:', error.message);
         res.writeHead(502, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Failed to reach AI service.' }));
+        res.end(JSON.stringify({ error: 'Failed to reach AI service. Please check your internet connection and try again.' }));
       });
       proxyReq.write(body);
       proxyReq.end();
