@@ -13,13 +13,13 @@ async function sendMessage() {
   input.value = '';
   const thinkingId = addMessage('DeepSeek is thinking...', 'assistant');
   try {
-    const response = await fetch('http://localhost:3000/api/deepseek-proxy', {
+    const response = await fetch('/api/deepseek-proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'deepseek-chat',
         messages: [
-          { role: 'system', content: 'You are DeepSeek AI, integrated into ZeroPen — a code editor. You help users with coding questions, explain code, and suggest improvements. Be concise and helpful.' },
+          { role: 'system', content: 'You are DeepSeek AI, integrated into ZeroPen. Help with coding questions. Be concise and helpful.' },
           { role: 'user', content: message }
         ],
         stream: false
@@ -31,7 +31,7 @@ async function sendMessage() {
     addMessage(reply, 'assistant');
   } catch (e) {
     removeMessage(thinkingId);
-    addMessage('Sorry, could not connect to DeepSeek. Make sure the proxy server is running.', 'assistant');
+    addMessage('Sorry, could not connect to DeepSeek. Please try again.', 'assistant');
   }
 }
 function addMessage(text, sender) {

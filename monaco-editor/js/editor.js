@@ -374,7 +374,7 @@ function setupDeepSeekPlaceholder() {
     if (ctx) msgs.push({ role: "system", content: `File "${ctx.fileName}":\n\`\`\`\n${ctx.content}\n\`\`\`` });
     msgs.push({ role: "user", content: userMessage });
     try {
-      const res = await fetch('http://localhost:3000/api/deepseek-proxy', {
+      const res = await fetch('/api/deepseek-proxy', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'deepseek-chat', messages: msgs, stream: false }),
       });
